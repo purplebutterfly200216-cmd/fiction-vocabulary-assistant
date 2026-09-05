@@ -1,0 +1,841 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Fiction Vocabulary Assistant</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+            background-color: #f8f6f2;
+            color: #1e1e2a;
+            line-height: 1.6;
+            padding: 2rem 1rem;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        /* Header */
+        header {
+            text-align: center;
+            margin-bottom: 3rem;
+        }
+
+        header h1 {
+            font-size: 1.9rem;
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+        }
+
+        header p {
+            color: #6a7a8a;
+            font-size: 0.95rem;
+        }
+
+        /* Upload Section */
+        .upload-section {
+            background: #fffcf7;
+            border: 2px dashed #c9b99a;
+            border-radius: 12px;
+            padding: 2rem;
+            margin-bottom: 2rem;
+            display: flex;
+            flex-wrap: wrap;
+            gap: 2rem;
+            align-items: center;
+        }
+
+        .upload-area {
+            flex: 1;
+            min-width: 250px;
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .upload-label {
+            display: inline-block;
+            padding: 0.75rem 1.5rem;
+            background-color: #1e1e2a;
+            color: #f8f6f2;
+            border-radius: 60px;
+            cursor: pointer;
+            font-weight: 500;
+            transition: all 0.3s ease;
+        }
+
+        .upload-label:hover {
+            background-color: #2d2d3a;
+            box-shadow: 0 4px 12px rgba(30, 30, 42, 0.15);
+        }
+
+        input[type="file"] {
+            display: none;
+        }
+
+        .file-status {
+            flex: 1;
+            min-width: 200px;
+        }
+
+        .file-status p {
+            font-size: 0.9rem;
+            color: #6a7a8a;
+            margin-bottom: 0.5rem;
+        }
+
+        .file-list {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.5rem;
+            font-size: 0.85rem;
+        }
+
+        .file-tag {
+            background-color: #eae4db;
+            padding: 0.35rem 0.75rem;
+            border-radius: 20px;
+            color: #1e1e2a;
+        }
+
+        .button-group {
+            display: flex;
+            gap: 1rem;
+        }
+
+        .btn {
+            padding: 0.75rem 1.5rem;
+            border: none;
+            border-radius: 60px;
+            cursor: pointer;
+            font-weight: 500;
+            font-size: 0.9rem;
+            transition: all 0.3s ease;
+        }
+
+        .btn-primary {
+            background-color: #1e1e2a;
+            color: #f8f6f2;
+        }
+
+        .btn-primary:hover {
+            background-color: #2d2d3a;
+            box-shadow: 0 4px 12px rgba(30, 30, 42, 0.15);
+        }
+
+        .btn-secondary {
+            background-color: transparent;
+            color: #1e1e2a;
+            border: 1.5px solid #d6cec0;
+        }
+
+        .btn-secondary:hover {
+            border-color: #c9b99a;
+            background-color: #f4f0e9;
+        }
+
+        .loading-spinner {
+            display: inline-block;
+            width: 1.2rem;
+            height: 1.2rem;
+            border: 2px solid #c9b99a;
+            border-top-color: #1e1e2a;
+            border-radius: 50%;
+            animation: spin 0.8s linear infinite;
+            margin-right: 0.5rem;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        .word-count {
+            text-align: right;
+            font-size: 0.9rem;
+            color: #6a7a8a;
+        }
+
+        /* Mode Tabs */
+        .mode-tabs {
+            display: flex;
+            gap: 1rem;
+            margin-bottom: 2rem;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+
+        .mode-tab {
+            padding: 0.75rem 1.5rem;
+            border: 1.5px solid #d6cec0;
+            background-color: transparent;
+            color: #1e1e2a;
+            border-radius: 40px;
+            cursor: pointer;
+            font-weight: 600;
+            font-size: 0.9rem;
+            transition: all 0.3s ease;
+            text-transform: uppercase;
+            letter-spacing: 0.04em;
+        }
+
+        .mode-tab:hover {
+            border-color: #c9b99a;
+            background-color: #f4f0e9;
+        }
+
+        .mode-tab.active {
+            background-color: #1e1e2a;
+            color: #f8f6f2;
+            border-color: #1e1e2a;
+        }
+
+        /* Search Section */
+        .search-section {
+            display: flex;
+            gap: 0.75rem;
+            margin-bottom: 2rem;
+            justify-content: center;
+        }
+
+        .search-input {
+            flex: 1;
+            max-width: 500px;
+            padding: 0.75rem 1.5rem;
+            border: 1.5px solid #c9b99a;
+            border-radius: 60px;
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+            font-size: 0.95rem;
+            transition: all 0.3s ease;
+        }
+
+        .search-input:focus {
+            outline: none;
+            border-color: #1e1e2a;
+            box-shadow: 0 0 0 3px rgba(201, 185, 154, 0.2);
+        }
+
+        .btn-search {
+            padding: 0.75rem 1.5rem;
+            background-color: #1e1e2a;
+            color: #f8f6f2;
+            border: none;
+            border-radius: 60px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: all 0.3s ease;
+        }
+
+        .btn-search:hover {
+            background-color: #2d2d3a;
+            box-shadow: 0 4px 12px rgba(30, 30, 42, 0.15);
+        }
+
+        /* Results Section */
+        .results-section {
+            display: none;
+            animation: fadeIn 0.3s ease;
+        }
+
+        .results-section.active {
+            display: block;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .mode-badge {
+            display: inline-block;
+            background-color: #1e1e2a;
+            color: #f8f6f2;
+            padding: 0.5rem 1rem;
+            border-radius: 40px;
+            font-size: 0.85rem;
+            font-weight: 600;
+            margin-bottom: 1.5rem;
+            text-transform: uppercase;
+            letter-spacing: 0.04em;
+        }
+
+        .not-found {
+            background-color: #edf0f5;
+            border-left: 4px solid #6a7a8a;
+            padding: 1.5rem;
+            border-radius: 8px;
+            margin-bottom: 2rem;
+            font-size: 0.95rem;
+            color: #1e1e2a;
+        }
+
+        /* Book Context */
+        .book-context-title {
+            font-size: 1.1rem;
+            font-weight: 600;
+            margin: 1.5rem 0 1rem 0;
+            text-transform: uppercase;
+            letter-spacing: 0.04em;
+            color: #1e1e2a;
+        }
+
+        .context-box {
+            background-color: #edf0f5;
+            border-left: 4px solid #6a7a8a;
+            padding: 1.5rem;
+            margin-bottom: 1.5rem;
+            border-radius: 8px;
+            line-height: 1.8;
+            font-size: 0.95rem;
+        }
+
+        .highlight {
+            background-color: #b55a4a;
+            color: #f8f6f2;
+            padding: 0.1rem 0.3rem;
+            border-radius: 2px;
+            font-weight: 600;
+        }
+
+        /* Suggestions Grid */
+        .suggestions-title {
+            font-size: 1.1rem;
+            font-weight: 600;
+            margin-top: 2rem;
+            margin-bottom: 1rem;
+            text-transform: uppercase;
+            letter-spacing: 0.04em;
+            color: #1e1e2a;
+        }
+
+        .suggestions-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+            gap: 1.5rem;
+            margin-bottom: 2rem;
+        }
+
+        .suggestion-card {
+            background-color: #fffcf7;
+            border: 1.5px solid #eae4db;
+            border-radius: 12px;
+            padding: 1.5rem;
+            transition: all 0.3s ease;
+            cursor: default;
+        }
+
+        .suggestion-card:hover {
+            border-color: #c9b99a;
+            box-shadow: 0 4px 12px rgba(201, 185, 154, 0.15);
+        }
+
+        .card-word {
+            font-size: 1.3rem;
+            font-weight: 700;
+            color: #1e1e2a;
+            margin-bottom: 0.75rem;
+        }
+
+        .card-frequency {
+            display: inline-block;
+            background-color: #1e1e2a;
+            color: #f8f6f2;
+            padding: 0.35rem 0.75rem;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            font-weight: 600;
+        }
+
+        /* Fallback Section */
+        .fallback-container {
+            display: none;
+            animation: fadeIn 0.3s ease;
+        }
+
+        .fallback-container.active {
+            display: block;
+        }
+
+        .fallback-title {
+            font-size: 1.1rem;
+            font-weight: 600;
+            margin: 2rem 0 1rem 0;
+            text-transform: uppercase;
+            letter-spacing: 0.04em;
+            color: #1e1e2a;
+        }
+
+        .fallback-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+            gap: 1.5rem;
+            margin-bottom: 2rem;
+        }
+
+        .fallback-card {
+            background-color: #fffcf7;
+            border: 1.5px solid #eae4db;
+            border-radius: 12px;
+            padding: 1rem;
+            transition: all 0.3s ease;
+        }
+
+        .fallback-card:hover {
+            border-color: #c9b99a;
+            box-shadow: 0 4px 12px rgba(201, 185, 154, 0.15);
+        }
+
+        .fallback-card-title {
+            font-size: 0.85rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.04em;
+            color: #6a7a8a;
+            margin-bottom: 0.75rem;
+        }
+
+        .fallback-words {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.5rem;
+        }
+
+        .fallback-word {
+            background-color: #eae4db;
+            padding: 0.35rem 0.75rem;
+            border-radius: 20px;
+            font-size: 0.85rem;
+            color: #1e1e2a;
+        }
+
+        /* Responsive Design */
+        @media (max-width: 768px) {
+            body {
+                padding: 1rem;
+            }
+
+            .upload-section {
+                flex-direction: column;
+                gap: 1rem;
+                padding: 1.5rem;
+            }
+
+            .upload-area {
+                min-width: auto;
+                width: 100%;
+            }
+
+            .button-group {
+                width: 100%;
+                flex-direction: column;
+            }
+
+            .btn, .upload-label {
+                width: 100%;
+                text-align: center;
+            }
+
+            .word-count {
+                width: 100%;
+                text-align: center;
+                margin-top: 0.5rem;
+            }
+
+            .mode-tabs {
+                justify-content: center;
+            }
+
+            .search-section {
+                flex-direction: column;
+            }
+
+            .search-input {
+                max-width: 100%;
+            }
+
+            .btn-search {
+                width: 100%;
+            }
+
+            .suggestions-grid, .fallback-grid {
+                grid-template-columns: 1fr;
+            }
+
+            header h1 {
+                font-size: 1.5rem;
+            }
+        }
+
+        @media (max-width: 600px) {
+            body {
+                padding: 0.75rem;
+            }
+
+            .upload-section {
+                padding: 1rem;
+            }
+
+            .mode-tabs {
+                gap: 0.5rem;
+            }
+
+            .mode-tab {
+                padding: 0.6rem 1rem;
+                font-size: 0.8rem;
+            }
+
+            header h1 {
+                font-size: 1.3rem;
+            }
+
+            header p {
+                font-size: 0.85rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>📚 Fiction Vocabulary Assistant</h1>
+            <p>Upload your favorite fiction books and find stronger, more precise words right from your own reading</p>
+        </header>
+
+        <!-- Upload Section -->
+        <div class="upload-section">
+            <div class="upload-area">
+                <label class="upload-label" for="pdf-files">
+                    📖 Upload PDFs
+                </label>
+                <input type="file" id="pdf-files" multiple accept=".pdf">
+                <div class="file-status">
+                    <p id="file-count">No files selected</p>
+                    <div class="file-list" id="file-list"></div>
+                </div>
+            </div>
+            <div class="button-group">
+                <button class="btn btn-secondary" id="clear-books">Clear Books</button>
+            </div>
+            <div class="word-count">
+                <p id="word-count-display">0 unique words</p>
+            </div>
+        </div>
+
+        <!-- Mode Tabs -->
+        <div class="mode-tabs">
+            <button class="mode-tab active" data-mode="VERBS">VERBS</button>
+            <button class="mode-tab" data-mode="ADVERBS">ADVERBS</button>
+            <button class="mode-tab" data-mode="ADJECTIVES">ADJECTIVES</button>
+        </div>
+
+        <!-- Search Section -->
+        <div class="search-section">
+            <input type="text" class="search-input" id="search-input" placeholder="Search for a verb…">
+            <button class="btn-search" id="search-btn">Search</button>
+        </div>
+
+        <!-- Results Section -->
+        <div class="results-section" id="results-section">
+            <div id="mode-badge" class="mode-badge"></div>
+
+            <!-- Book Context -->
+            <div id="context-container">
+                <h3 class="book-context-title">From Your Books</h3>
+                <div id="context-display"></div>
+            </div>
+
+            <!-- Suggestions -->
+            <div id="suggestions-container">
+                <h3 class="suggestions-title">Stronger Alternatives</h3>
+                <div class="suggestions-grid" id="suggestions-grid"></div>
+            </div>
+        </div>
+
+        <!-- Fallback Section (No Books Uploaded) -->
+        <div class="fallback-container" id="fallback-container">
+            <p style="color: #6a7a8a; font-size: 0.95rem; margin-bottom: 1.5rem; text-align: center;">
+                Upload PDFs to see words from your own books. Here's a preview of available suggestions:
+            </p>
+            <div id="fallback-display"></div>
+        </div>
+    </div>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.16.105/pdf.min.js"></script>
+    <script>
+        // Set the worker source
+        pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.16.105/pdf.worker.min.js';
+
+        // Data Structures
+        const VERB_CATEGORIES = {
+            'WALK — Quickly': ['scamper', 'scoot', 'scramble', 'scurry', 'trot'],
+            'WALK — Slowly': ['dawdle', 'lumber', 'plod', 'shuffle', 'slog', 'trudge'],
+            'WALK — With Confidence': ['march', 'parade', 'saunter', 'stride', 'strut', 'swagger'],
+            'LAUGH — Quietly': ['chuckle', 'titter'],
+            'LAUGH — Loudly': ['bellow', 'chortle', 'guffaw', 'roar'],
+            'LOOK — Quickly': ['glance', 'glimpse', 'scan', 'skim'],
+            'LOOK — Continually': ['gaze', 'observe', 'peruse', 'scrutinize'],
+            'RUN — High Speed': ['bound', 'dart', 'dash', 'fly', 'sprint'],
+            'SPEAK — Gently': ['utter', 'whisper'],
+            'SPEAK — Harshly': ['bark', 'growl', 'hiss', 'snap'],
+            'OTHER STRONG VERBS': ['dazzle', 'elicit', 'ignite', 'muster', 'radiate', 'thrill']
+        };
+
+        const ADVERB_DATA = {
+            'Quiet': ['quietly', 'softly', 'gently', 'smoothly'],
+            'Intensity': ['urgently', 'fiercely', 'vigorously', 'forcefully'],
+            'Emotion': ['tenderly', 'warmly', 'coldly', 'bitterly'],
+            'Manner': ['swiftly', 'slowly', 'carefully', 'carelessly'],
+            'Amusement': ['mischievously', 'playfully', 'gleefully', 'joyfully']
+        };
+
+        const ADJECTIVE_DATA = {
+            'Eyes': ['almond-shaped', 'round', 'narrow', 'hooded', 'deep-set', 'icy blue', 'warm hazel', 'piercing', 'gentle'],
+            'Hair': ['blonde', 'raven', 'auburn', 'silky', 'coarse', 'flowing', 'tangled', 'lustrous'],
+            'Voice': ['soft', 'booming', 'warm', 'cold', 'melodic', 'harsh', 'soothing'],
+            'Face': ['angular', 'round', 'scarred', 'weathered', 'youthful', 'stern', 'kind']
+        };
+
+        // State
+        let state = {
+            corpus: {},
+            rawText: '',
+            files: [],
+            currentMode: 'VERBS',
+            searchHistory: {}
+        };
+
+        // DOM Elements
+        const pdfInput = document.getElementById('pdf-files');
+        const fileCount = document.getElementById('file-count');
+        const fileList = document.getElementById('file-list');
+        const clearBooksBtn = document.getElementById('clear-books');
+        const wordCountDisplay = document.getElementById('word-count-display');
+        const modeTabs = document.querySelectorAll('.mode-tab');
+        const searchInput = document.getElementById('search-input');
+        const searchBtn = document.getElementById('search-btn');
+        const resultsSection = document.getElementById('results-section');
+        const contextDisplay = document.getElementById('context-display');
+        const suggestionsGrid = document.getElementById('suggestions-grid');
+        const modeBadge = document.getElementById('mode-badge');
+        const fallbackContainer = document.getElementById('fallback-container');
+        const fallbackDisplay = document.getElementById('fallback-display');
+
+        // Event Listeners
+        pdfInput.addEventListener('change', handleFileSelection);
+        clearBooksBtn.addEventListener('click', clearBooks);
+        modeTabs.forEach(tab => tab.addEventListener('click', handleModeChange));
+        searchBtn.addEventListener('click', performSearch);
+        searchInput.addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') performSearch();
+        });
+
+        // File Selection Handler
+        async function handleFileSelection(e) {
+            const files = Array.from(e.target.files).slice(0, 10);
+            state.files = files;
+
+            if (files.length === 0) {
+                fileCount.textContent = 'No files selected';
+                fileList.innerHTML = '';
+                return;
+            }
+
+            fileCount.textContent = `Processing ${files.length} file${files.length !== 1 ? 's' : ''}...`;
+            fileCount.innerHTML = `<span class="loading-spinner"></span>${fileCount.textContent}`;
+
+            try {
+                await extractTextFromPDFs(files);
+                buildCorpus();
+                updateFileUI();
+                showFallback();
+            } catch (error) {
+                console.error('Error processing PDFs:', error);
+                fileCount.textContent = 'Error processing files';
+            }
+        }
+
+        // Extract Text from PDFs
+        async function extractTextFromPDFs(files) {
+            let allText = '';
+            
+            for (let i = 0; i < files.length; i++) {
+                const file = files[i];
+                const arrayBuffer = await file.arrayBuffer();
+                const pdf = await pdfjsLib.getDocument({ data: arrayBuffer }).promise;
+                
+                for (let pageNum = 1; pageNum <= pdf.numPages; pageNum++) {
+                    const page = await pdf.getPage(pageNum);
+                    const textContent = await page.getTextContent();
+                    const pageText = textContent.items.map(item => item.str).join(' ');
+                    allText += ' ' + pageText;
+                }
+            }
+
+            state.rawText = allText.toLowerCase();
+        }
+
+        // Build Corpus (Word Frequency Index)
+        function buildCorpus() {
+            const words = state.rawText.match(/[a-z'-]+/g) || [];
+            const corpus = {};
+
+            words.forEach(word => {
+                corpus[word] = (corpus[word] || 0) + 1;
+            });
+
+            state.corpus = corpus;
+        }
+
+        // Update File UI
+        function updateFileUI() {
+            const uniqueWords = Object.keys(state.corpus).length;
+            const totalChars = state.rawText.length;
+
+            fileCount.innerHTML = `${state.files.length} PDF${state.files.length !== 1 ? 's' : ''} uploaded`;
+            
+            fileList.innerHTML = state.files.map(f => 
+                `<span class="file-tag">${f.name.slice(0, 20)}${f.name.length > 20 ? '...' : ''}</span>`
+            ).join('');
+
+            wordCountDisplay.textContent = `${uniqueWords.toLocaleString()} unique words`;
+        }
+
+        // Clear Books
+        function clearBooks() {
+            state.corpus = {};
+            state.rawText = '';
+            state.files = [];
+            pdfInput.value = '';
+            fileCount.textContent = 'No files selected';
+            fileList.innerHTML = '';
+            wordCountDisplay.textContent = '0 unique words';
+            resultsSection.classList.remove('active');
+            showFallback();
+        }
+
+        // Mode Change Handler
+        function handleModeChange(e) {
+            modeTabs.forEach(tab => tab.classList.remove('active'));
+            e.target.classList.add('active');
+            state.currentMode = e.target.dataset.mode;
+
+            // Update placeholder
+            const placeholders = {
+                'VERBS': 'Search for a verb…',
+                'ADVERBS': 'Enter a verb…',
+                'ADJECTIVES': 'Enter a noun…'
+            };
+            searchInput.placeholder = placeholders[state.currentMode];
+            searchInput.value = '';
+            resultsSection.classList.remove('active');
+        }
+
+        // Perform Search
+        function performSearch() {
+            const query = searchInput.value.trim().toLowerCase();
+            if (!query) return;
+
+            resultsSection.classList.add('active');
+            fallbackContainer.classList.remove('active');
+
+            // Find snippets
+            const snippets = findSnippets(query);
+            
+            // Get suggestions
+            const suggestions = getSuggestions(query);
+
+            // Render results
+            if (snippets.length === 0 && Object.keys(state.corpus).length > 0) {
+                contextDisplay.innerHTML = `<div class="not-found">Not found in your books</div>`;
+            } else {
+                contextDisplay.innerHTML = snippets.map(snippet => 
+                    `<div class="context-box">${snippet}</div>`
+                ).join('');
+            }
+
+            modeBadge.textContent = `${state.currentMode} — "${query}"`;
+            suggestionsGrid.innerHTML = suggestions.map(word => 
+                `<div class="suggestion-card">
+                    <div class="card-word">${word}</div>
+                    <span class="card-frequency">${state.corpus[word]} occurrences</span>
+                </div>`
+            ).join('');
+        }
+
+        // Find Snippets
+        function findSnippets(word) {
+            const regex = new RegExp(`[^.!?]*\\b${word}\\b[^.!?]*[.!?]`, 'gi');
+            const matches = state.rawText.match(regex) || [];
+            
+            return matches.slice(0, 3).map(snippet => {
+                const highlightedSnippet = snippet.replace(
+                    new RegExp(`\\b(${word})\\b`, 'gi'),
+                    '<span class="highlight">$1</span>'
+                );
+                return highlightedSnippet.trim();
+            });
+        }
+
+        // Get Suggestions
+        function getSuggestions(searchWord) {
+            let wordList = [];
+
+            if (state.currentMode === 'VERBS') {
+                wordList = Object.values(VERB_CATEGORIES).flat();
+            } else if (state.currentMode === 'ADVERBS') {
+                wordList = Object.values(ADVERB_DATA).flat();
+            } else if (state.currentMode === 'ADJECTIVES') {
+                wordList = Object.values(ADJECTIVE_DATA).flat();
+            }
+
+            // Filter to only words in corpus
+            const inCorpus = wordList.filter(word => state.corpus[word]);
+
+            // Sort by frequency
+            return inCorpus.sort((a, b) => state.corpus[b] - state.corpus[a]);
+        }
+
+        // Show Fallback
+        function showFallback() {
+            if (Object.keys(state.corpus).length === 0) {
+                fallbackContainer.classList.add('active');
+                resultsSection.classList.remove('active');
+                renderFallback();
+            } else {
+                fallbackContainer.classList.remove('active');
+            }
+        }
+
+        // Render Fallback
+        function renderFallback() {
+            const fallbackData = state.currentMode === 'VERBS' ? VERB_CATEGORIES : 
+                                 state.currentMode === 'ADVERBS' ? ADVERB_DATA :
+                                 ADJECTIVE_DATA;
+
+            fallbackDisplay.innerHTML = Object.entries(fallbackData)
+                .map(([category, words]) => 
+                    `<div class="fallback-card">
+                        <div class="fallback-card-title">${category}</div>
+                        <div class="fallback-words">
+                            ${words.map(w => `<span class="fallback-word">${w}</span>`).join('')}
+                        </div>
+                    </div>`
+                ).join('');
+        }
+
+        // Initialize
+        showFallback();
+    </script>
+</body>
+</html>
